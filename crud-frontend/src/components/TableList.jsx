@@ -1,14 +1,37 @@
-export default function TableList({onOpen}){
-    // make a list
-    const clients = [
-        {id: 1, name: "John Doe", "email": "johndoe@gmail.com", job: "developer", rate: "100", isactive: true},
-        {id: 2, name: "John1 Doe", "email": "john1doe@gmail.com", job: "developer1", rate: "101", isactive: true},
-        {id: 3, name: "John2 Doe", "email": "john2doe@gmail.com", job: "developer2", rate: "102", isactive: false},
+import axios from 'axios';
+import React, { useState } from 'react';
+export default function TableList({handleOpen, searchTerm, tableData, setTableData}){
 
-    ]
+    
+    const [error, setError] = useState(null);
+
+     // Filter the tableData based on the searchTerm
+     const filteredData = tableData.filter(client => 
+        client.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.job.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleDelete = async (id) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this client?");
+        if (confirmDelete) {
+            try {
+                await axios.delete(`http://localhost:3000/api/clients/${id}`); // API call to delete client
+                setTableData((prevData) => prevData.filter(client => client.id !== id)); // Update state
+            } catch (err) {
+                setError(err.message); // Handle any errors
+            }
+        }
+    };
+
+    
+    
+
     return(
         <>
+
             <div className="overflow-x-auto mt-10">
+                {error && <div className="alert alert-error">{error}</div>}
                 <table className="table">
                     {/* head */}
                     <thead>
@@ -23,7 +46,7 @@ export default function TableList({onOpen}){
                     </thead>
                     <tbody>
 
-                    {clients.map((client) => (
+                    {filteredData.map((client) => (
                         <tr key={client.id}  className="hover:bg-base-300">
                             <th>{client.id}</th>
                             <td>{client.name}</td>
@@ -37,12 +60,12 @@ export default function TableList({onOpen}){
 
                             </td>
                             <td>
-                                <button onClick={onOpen} className="btn btn-secondary">
+                                <button onClick={() => handleOpen('edit', client)} className="btn btn-secondary">
                                     Update
                                 </button>
                             </td>
                             <td>
-                                <button className="btn btn-soft btn-error">
+                                <button className="btn btn-soft btn-error" onClick={()=>handleDelete(client.id)}>
                                     Delete
                                 </button>
                             </td>

@@ -1,6 +1,6 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 
-export default function ModalForm({isOpen, onClose, mode, onSubmit}){
+export default function ModalForm({isOpen, onClose, mode, OnSubmit, clientData}){
     const [rate, setRate] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -11,12 +11,36 @@ export default function ModalForm({isOpen, onClose, mode, onSubmit}){
         setStatus(e.target.value === 'Active'); // boolean result, target is the select and the value is the one chosen
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         // prevents the default browser behavior for the few events that have it
         e.preventDefault();
+
+        try{
+            const clientData = {name, email, job, rate: Number(rate) , isactive: status };
+            await OnSubmit(clientData);
+
+        } catch (err) {
+            console.log("error adding client", err);
+        }
         onClose();
     }
     
+    useEffect(() => {
+        if (mode === 'edit' && clientData) {
+            setName(clientData.name);
+            setEmail(clientData.email);
+            setJob(clientData.job);
+            setRate(clientData.rate);
+            setStatus(clientData.isActive); // Assuming isActive is a boolean
+        } else {
+            // Reset fields when adding a new client
+            setName('');
+            setEmail('');
+            setJob('');
+            setRate('');
+            setStatus(false);
+        }
+    }, [mode, clientData]);
     
     
     

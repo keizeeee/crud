@@ -1,4 +1,8 @@
-export default function Navbar({onOpen}){
+export default function Navbar({onOpen, onSearch}){
+    const handleSearchChange = (event) => {
+        onSearch(event.target.value);
+    }
+
     return (
         <>
         <div className="navbar bg-base-100 shadow-sm">
@@ -7,7 +11,7 @@ export default function Navbar({onOpen}){
                 <a className="btn btn-ghost text-xl">Clients</a>
             </div>
             <div className="navbar-center ">
-                <input type="text" placeholder="Search" className="input input-bordered w-48 md:w-auto" />
+                <input type="text" placeholder="Search" className="input input-bordered w-48 md:w-auto" onChange={handleSearchChange} />
                
             </div>
             <div className="navbar-end">
